@@ -19,7 +19,7 @@ const Portfolio = (() => {
             { name: "C#", category: "backend", image: "assets/skills/cs-icon.svg", learning: true },
             { name: "C++", category: "backend", image: "assets/skills/cpp-icon.svg", learning: true },
             { name: "Unity", category: "gameengine", image: "assets/skills/unity-icon.svg", learning: true },
-            { name: "Unreal Engine", category: "gameengine", image: "assets/skills/ue-icon.svg", learning: true },,
+            { name: "Unreal Engine", category: "gameengine", image: "assets/skills/ue-icon.svg", learning: true },
             { name: "Blender", category: "videographics", image: "assets/skills/blender-icon.svg", learning: true },
             { name: "Git", category: "backend", image: "assets/skills/git-icon.svg", learning: true },
             { name: "Javascript", category: "backend", image: "assets/skills/js-icon.svg", learning: true },
@@ -395,7 +395,7 @@ const Portfolio = (() => {
             { id: 'pet_play_20', name: 'Play Champion', description: 'Played with your digital pet 20 times!', event: 'pet_play_20' },
             { id: 'pet_happy_zero', name: 'Pet Neglect', description: 'Let your pet\'s happiness drop to 0%.', event: 'pet_happy_zero' },
             { id: 'pet_hunger_zero', name: 'Pet Starved', description: 'Let your pet\'s hunger drop to 0%.', event: 'pet_hunger_zero' },
-            { id: 'birthday_visitor', name: 'Birthday Visitor', description: 'Visited during his birthday!', event: 'birthday' },
+            { id: 'birthday_visitor', name: 'Birthday Visitor', description: 'Visited during his birthday month!', event: 'birthday' },
             { id: 'holiday_special', name: 'Holiday Special', description: 'Visited during a major holiday!', event: 'holiday' },
             { id: 'new_year_code', name: 'New Year New Code', description: 'Visited in January!', event: 'january' },
             { id: 'leap_day', name: 'Leap Day Bonus', description: 'Visited on February 29th!', event: 'leapday' },
@@ -410,7 +410,13 @@ const Portfolio = (() => {
             { id: 'scroll_master', name: 'Scroll Master', description: 'Scrolled to the very bottom of the page.', event: 'scroll' },
             { id: 'bookmark_buddy', name: 'Librarian', description: 'Bookmarked the portfolio site.', event: 'bookmark' },
             { id: 'flash_visit', name: 'Flash Visit', description: 'Visited the site for less than 10 seconds.', event: 'flash' },
-            { id: 'time_traveler', name: 'Time Traveler', description: 'Spent a total of 5 hours on the site.', event: '5hours' }
+            { id: 'time_traveler', name: 'Time Traveler', description: 'Spent a total of 5 hours on the site.', event: '5hours' },
+            { id: 'skill_enthusiast', name: 'Skill Enthusiast', description: 'Used the skill filter buttons at least 5 times.', event: 'skill_filter_clicks' },
+            { id: 'curiosity_seeker', name: 'Curiosity Seeker', description: 'Clicked on at least one project link.', event: 'project_link_click' },
+            { id: 'gravity_master', name: 'Gravity Enthusiast', description: 'Activated the gravity effect 3 times.', event: 'gravity_activations' },
+            { id: 'pet_whisperer', name: 'Pet Whisperer', description: 'Maintained your digital pet\'s hunger and happiness above 80% for 5 consecutive minutes.', event: 'pet_whisperer' },
+            { id: 'code_inspector', name: 'Code Inspector', description: 'Opened the browser\'s developer tools.', event: 'dev_tools_open' },
+            { id: 'achievement_hunter', name: 'Achievement Hunter', description: 'Unlocked 10 achievements.', event: 'unlocked_10_achievements' }
         ];
 
         let timeSpent = parseInt(localStorage.getItem('portfolio_time_spent') || '0');
@@ -422,6 +428,14 @@ const Portfolio = (() => {
         let sidebarClicks = JSON.parse(localStorage.getItem('sidebar_clicks') || '{}');
         let themeSwitched = localStorage.getItem('theme_switched') === 'true';
 
+        let skillFilterClicks = parseInt(localStorage.getItem('skill_filter_clicks') || '0');
+        let projectLinkClicked = localStorage.getItem('project_link_clicked') === 'true';
+        let gravityActivations = parseInt(localStorage.getItem('gravity_activations') || '0');
+        let petWhispererTimer = null;
+        let petWhispererStartTime = 0;
+        let devToolsOpened = localStorage.getItem('dev_tools_opened') === 'true';
+
+
         const showAchievementNotification = (achievement) => {
             const notification = document.createElement('div');
             notification.classList.add('achievement-notification');
@@ -431,6 +445,21 @@ const Portfolio = (() => {
             setTimeout(() => {
                 notification.remove();
             }, 3500);
+
+            // Check for Achievement Hunter after a new achievement is unlocked
+            if (earnedAchievements.length >= 10 && !earnedAchievements.includes('achievement_hunter')) {
+                earnedAchievements.push('achievement_hunter');
+                localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                // Call the notification for achievement_hunter directly, avoiding recursion
+                const hunterAchievement = achievements.find(a => a.id === 'achievement_hunter');
+                const hunterNotification = document.createElement('div');
+                hunterNotification.classList.add('achievement-notification');
+                hunterNotification.innerHTML = `<strong>Achievement Unlocked!</strong><br>${hunterAchievement.name}: ${hunterAchievement.description}`;
+                notificationContainer.appendChild(hunterNotification);
+                setTimeout(() => {
+                    hunterNotification.remove();
+                }, 3500);
+            }
         };
 
         const checkAchievements = () => {
@@ -469,6 +498,14 @@ const Portfolio = (() => {
                     earnedAchievements.push('gravity_first');
                     localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
                     showAchievementNotification(achievements.find(a => a.id === 'gravity_first'));
+                }
+                // Gravity Master
+                gravityActivations++;
+                localStorage.setItem('gravity_activations', gravityActivations.toString());
+                if (gravityActivations >= 3 && !earnedAchievements.includes('gravity_master')) {
+                    earnedAchievements.push('gravity_master');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'gravity_master'));
                 }
             });
         }
@@ -571,13 +608,79 @@ const Portfolio = (() => {
         // Check every 5 seconds
         setInterval(checkPetZeroStats, 5000);
 
+        // Skill Enthusiast
+        document.querySelectorAll('.skill-filters button').forEach(button => {
+            button.addEventListener('click', () => {
+                skillFilterClicks++;
+                localStorage.setItem('skill_filter_clicks', skillFilterClicks.toString());
+                if (skillFilterClicks >= 5 && !earnedAchievements.includes('skill_enthusiast')) {
+                    earnedAchievements.push('skill_enthusiast');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'skill_enthusiast'));
+                }
+            });
+        });
+
+        // Curiosity Seeker
+        dom.projectsContainer.addEventListener('click', (e) => {
+            const projectLinkBtn = e.target.closest('.project-link-btn');
+            if (projectLinkBtn && !projectLinkClicked) {
+                projectLinkClicked = true;
+                localStorage.setItem('project_link_clicked', 'true');
+                if (!earnedAchievements.includes('curiosity_seeker')) {
+                    earnedAchievements.push('curiosity_seeker');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'curiosity_seeker'));
+                }
+            }
+        });
+
+        // Pet Whisperer
+        function checkPetWhisperer() {
+            const petState = JSON.parse(localStorage.getItem('digital_pet_state') || '{}');
+            if (petState.hunger > 80 && petState.happiness > 80) {
+                if (petWhispererStartTime === 0) {
+                    petWhispererStartTime = Date.now();
+                }
+                const duration = (Date.now() - petWhispererStartTime) / 1000; // in seconds
+                if (duration >= 300 && !earnedAchievements.includes('pet_whisperer')) { // 300 seconds = 5 minutes
+                    earnedAchievements.push('pet_whisperer');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'pet_whisperer'));
+                    clearInterval(petWhispererTimer); // Stop checking once unlocked
+                }
+            } else {
+                petWhispererStartTime = 0; // Reset timer if stats drop
+            }
+        }
+        petWhispererTimer = setInterval(checkPetWhisperer, 10000); // Check every 10 seconds
+
+        // Code Inspector
+        const checkDevTools = () => {
+            if (!devToolsOpened) {
+                const threshold = 160; // A common threshold for dev tools being open
+                if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+                    devToolsOpened = true;
+                    localStorage.setItem('dev_tools_opened', 'true');
+                    if (!earnedAchievements.includes('code_inspector')) {
+                        earnedAchievements.push('code_inspector');
+                        localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                        showAchievementNotification(achievements.find(a => a.id === 'code_inspector'));
+                    }
+                }
+            }
+        };
+        window.addEventListener('resize', checkDevTools);
+        setInterval(checkDevTools, 1000); // Check every second
+
+
         // Special Date Achievements 
         const now = new Date();
         const month = now.getMonth(); 
         const date = now.getDate();
         const day = now.getDay(); 
 
-        // Birthday (July 23rd)
+        // Birthday Visitor (July 23rd)
         const birthdayMonth = 6; 
         const birthdayDate = 23;
         if (
@@ -784,7 +887,13 @@ const Portfolio = (() => {
         { id: 'scroll_master', name: 'Scroll Master', description: 'Scrolled to the very bottom of the page.', event: 'scroll' },
         { id: 'bookmark_buddy', name: 'Librarian', description: 'Bookmarked the portfolio site.', event: 'bookmark' },
         { id: 'flash_visit', name: 'Flash Visit', description: 'Visited the site for less than 10 seconds.', event: 'flash' },
-        { id: 'time_traveler', name: 'Time Traveler', description: 'Spent a total of 5 hours on the site.', event: '5hours' }
+        { id: 'time_traveler', name: 'Time Traveler', description: 'Spent a total of 5 hours on the site.', event: '5hours' },
+        { id: 'skill_enthusiast', name: 'Skill Enthusiast', description: 'Used the skill filter buttons at least 5 times.', event: 'skill_filter_clicks' },
+        { id: 'curiosity_seeker', name: 'Curiosity Seeker', description: 'Clicked on at least one project link.', event: 'project_link_click' },
+        { id: 'gravity_master', name: 'Gravity Enthusiast', description: 'Activated the gravity effect 3 times.', event: 'gravity_activations' },
+        { id: 'pet_whisperer', name: 'Pet Whisperer', description: 'Maintained your digital pet\'s hunger and happiness above 80% for 5 consecutive minutes.', event: 'pet_whisperer' },
+        { id: 'code_inspector', name: 'Code Inspector', description: 'Opened the browser\'s developer tools.', event: 'dev_tools_open' },
+        { id: 'achievement_hunter', name: 'Achievement Hunter', description: 'Unlocked 10 achievements.', event: 'unlocked_10_achievements' }
     ];
 
     const modal = document.getElementById('achievements-modal');
@@ -833,12 +942,12 @@ const Portfolio = (() => {
         // Example: time-based or milestone-based achievements get higher tiers
         let tier = 'bronze';
         if (
-            ['pet_feed_10', 'pet_play_20', 'marathoner', 'time_traveler', 'daily_visitor', 'social_butterfly'].includes(achievement.id)
+            ['pet_feed_10', 'pet_play_20', 'marathoner', 'time_traveler', 'daily_visitor', 'social_butterfly', 'skill_enthusiast', 'gravity_master'].includes(achievement.id)
         ) {
             tier = 'silver';
         }
         if (
-            ['time_traveler', 'marathoner', 'daily_visitor'].includes(achievement.id)
+            ['time_traveler', 'marathoner', 'daily_visitor', 'achievement_hunter', 'pet_whisperer'].includes(achievement.id)
         ) {
             tier = 'gold';
         }
@@ -870,7 +979,7 @@ const Portfolio = (() => {
                 <div class="achievement-info">
                     <div class="achievement-name">${achievement.name}</div>
                     <div class="achievement-desc">${achievement.description}</div>
-                    ${!isEarned && achievement.timeRequired !== undefined ? `<div class="achievement-progress">Progress: ${Math.round(getAchievementProgress(achievement))}%</div>` : ''}
+                    ${!isEarned && getAchievementProgress(achievement) !== undefined ? `<div class="achievement-progress">Progress: ${Math.round(getAchievementProgress(achievement))}%</div>` : ''}
                 </div>
             `;
             if (isEarned) {
@@ -883,7 +992,41 @@ const Portfolio = (() => {
 
     function getAchievementProgress(achievement) {
         const timeSpent = parseInt(localStorage.getItem('portfolio_time_spent') || '0');
-        return Math.min(100, (timeSpent / achievement.timeRequired) * 100);
+        const earnedAchievements = JSON.parse(localStorage.getItem('portfolio_achievements') || '[]');
+
+        if (earnedAchievements.includes(achievement.id)) {
+            return 100; // Already earned
+        }
+
+        switch (achievement.id) {
+            case 'five_seconds':
+            case 'thirty_seconds':
+            case 'one_minute':
+            case 'five_minutes':
+            case 'time_traveler':
+                return Math.min(100, (timeSpent / achievement.timeRequired) * 100);
+            case 'skill_enthusiast':
+                const skillFilterClicks = parseInt(localStorage.getItem('skill_filter_clicks') || '0');
+                return Math.min(100, (skillFilterClicks / 5) * 100);
+            case 'gravity_master':
+                const gravityActivations = parseInt(localStorage.getItem('gravity_activations') || '0');
+                return Math.min(100, (gravityActivations / 3) * 100);
+            case 'achievement_hunter':
+                return Math.min(100, (earnedAchievements.length / 10) * 100);
+            case 'curiosity_seeker':
+                return localStorage.getItem('project_link_clicked') === 'true' ? 100 : 0;
+            case 'code_inspector':
+                return localStorage.getItem('dev_tools_opened') === 'true' ? 100 : 0;
+            case 'pet_whisperer':
+                const petWhispererStartTime = parseInt(localStorage.getItem('pet_whisperer_start_time') || '0');
+                if (petWhispererStartTime > 0) {
+                    const duration = (Date.now() - petWhispererStartTime) / 1000;
+                    return Math.min(100, (duration / 300) * 100);
+                }
+                return 0;
+            default:
+                return 0; // Default for achievements without specific progress tracking
+        }
     }
     }
 
@@ -903,8 +1046,8 @@ const Portfolio = (() => {
         };
 
         const updatePetDisplay = () => {
-            hungerDisplay.textContent = `${petState.hunger}%`;
-            happinessDisplay.textContent = `${petState.happiness}%`;
+            hungerDisplay.textContent = `${petState.hunger.toFixed(0)}%`;
+            happinessDisplay.textContent = `${petState.happiness.toFixed(0)}%`;
 
             if (petState.happiness < 30 || petState.hunger < 30) {
                 petImage.src = 'assets/gif/pet-sad.gif'; 
