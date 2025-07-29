@@ -110,6 +110,7 @@ const Portfolio = (() => {
             light: document.getElementById("lightTheme"),
             dark: document.getElementById("darkTheme")
         }
+        gravityToggle: document.getElementById("gravityToggle")
     };
 
     // Initialize Intersection Observer
@@ -160,22 +161,21 @@ const Portfolio = (() => {
     };
 
     // Gravity effect functionality
-    const initGravityEffect = () => {
-        const gravityToggle = document.getElementById("gravityToggle");
-        if (!gravityToggle) return;
-
-        gravityToggle.addEventListener("click", () => {
-            if (document.body.classList.contains("gravity-active")) return;
-            
-            document.body.classList.add("gravity-active");
-            
-            // Reset after animation completes
-            setTimeout(() => {
-                document.body.classList.remove("gravity-active");
-                void document.body.offsetWidth;
-            }, 2500); 
-        });
-    };
+const initGravityEffect = () => {
+    // const gravityToggle = document.getElementById("gravityToggle"); 
+    if (!dom.gravityToggle) return; 
+    dom.gravityToggle.addEventListener("click", () => { 
+        if (document.body.classList.contains("gravity-active")) return;
+        
+        document.body.classList.add("gravity-active");
+        
+        // Reset after animation completes
+        setTimeout(() => {
+            document.body.classList.remove("gravity-active");
+            void document.body.offsetWidth;
+        }, 2500); 
+    });
+};
 
     // Theme switcher functionality
     const initThemeSwitcher = () => {
@@ -386,7 +386,7 @@ const Portfolio = (() => {
             { id: 'thirty_seconds', name: 'Deep Dive', description: 'Spent 30 seconds on the site.', timeRequired: 30 },
             { id: 'one_minute', name: 'Explorer', description: 'Spent 1 minute on the site.', timeRequired: 60 },
             { id: 'five_minutes', name: 'Dedicated Visitor', description: 'Spent 5 minutes on the site.', timeRequired: 300 },
-            { id: 'gravity_first', name: 'Gravity Explorer', description: 'Activated gravity for the first time!', event: 'gravity' },
+            { id: 'gravity_first', name: 'Sir Isaac Newton jr.', description: 'Activated gravity for the first time!', event: 'gravity' },
             { id: 'pet_first', name: 'Pet Owner', description: 'Interacted with your digital pet for the first time!', event: 'pet' },
             { id: 'pet_feed', name: 'Pet Feeder', description: 'Fed your digital pet for the first time!', event: 'pet_feed' },
             { id: 'theme_switch', name: 'Theme Shifter', description: 'Switched the website theme for the first time!', event: 'theme_switch' },
@@ -395,7 +395,7 @@ const Portfolio = (() => {
             { id: 'pet_play_20', name: 'Play Champion', description: 'Played with your digital pet 20 times!', event: 'pet_play_20' },
             { id: 'pet_happy_zero', name: 'Pet Neglect', description: 'Let your pet\'s happiness drop to 0%.', event: 'pet_happy_zero' },
             { id: 'pet_hunger_zero', name: 'Pet Starved', description: 'Let your pet\'s hunger drop to 0%.', event: 'pet_hunger_zero' },
-            { id: 'birthday_visitor', name: 'Birthday Visitor', description: 'Visited during your birthday month!', event: 'birthday' },
+            { id: 'birthday_visitor', name: 'Birthday Visitor', description: 'Visited during his birthday month!', event: 'birthday' },
             { id: 'holiday_special', name: 'Holiday Special', description: 'Visited during a major holiday!', event: 'holiday' },
             { id: 'new_year_code', name: 'New Year New Code', description: 'Visited in January!', event: 'january' },
             { id: 'leap_day', name: 'Leap Day Bonus', description: 'Visited on February 29th!', event: 'leapday' },
@@ -408,10 +408,33 @@ const Portfolio = (() => {
             { id: 'weekend_warrior', name: 'Weekend Warrior', description: 'Visited on a weekend.', event: 'weekend' },
             { id: 'social_butterfly', name: 'Social Butterfly', description: 'Clicked all social media links.', event: 'social' },
             { id: 'scroll_master', name: 'Scroll Master', description: 'Scrolled to the very bottom of the page.', event: 'scroll' },
-            { id: 'bookmark_buddy', name: 'Bookmark Buddy', description: 'Bookmarked the portfolio site.', event: 'bookmark' },
+            { id: 'bookmark_buddy', name: 'Librarian', description: 'Bookmarked the portfolio site.', event: 'bookmark' },
             { id: 'flash_visit', name: 'Flash Visit', description: 'Visited the site for less than 10 seconds.', event: 'flash' },
-            { id: 'time_traveler', name: 'Time Traveler', description: 'Spent a total of 5 hours on the site.', event: '5hours' }
+            { id: 'time_traveler', name: 'Time Traveler', description: 'Spent a total of 5 hours on the site.', event: '5hours' },
+            { id: 'skill_enthusiast', name: 'Skill Enthusiast', description: 'Used the skill filter buttons at least 5 times.', event: 'skill_filter_5' },
+            { id: 'curiosity_seeker', name: 'Curiosity Seeker', description: 'Clicked on at least one project link.', event: 'project_link' },
+            { id: 'gravity_master', name: 'Gravity Master', description: 'Activated the gravity effect 3 times.', event: 'gravity_3' },
+            { id: 'pet_whisperer', name: 'Pet Whisperer', description: 'Maintained your digital pet\'s hunger and happiness above 80% for 5 consecutive minutes.', event: 'pet_whisperer' },
+            { id: 'code_inspector', name: 'Code Inspector', description: 'Opened the browser\'s developer tools.', event: 'devtools' },
+            { id: 'achievement_hunter', name: 'Achievement Hunter', description: 'Unlocked 10 achievements.', event: 'achievement_10' }
         ];
+
+        if (dom.gravityToggle) { // Use dom.gravityToggle
+        dom.gravityToggle.addEventListener("click", () => { // Use dom.gravityToggle
+            gravityCount++;
+            localStorage.setItem('gravity_count', gravityCount.toString());
+            if (gravityCount >= 3 && !earnedAchievements.includes('gravity_master')) {
+                earnedAchievements.push('gravity_master');
+                localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                showAchievementNotification(achievements.find(a => a.id === 'gravity_master'));
+            }
+            if (!earnedAchievements.includes('gravity_first')) { // This check was already there, keep it
+                earnedAchievements.push('gravity_first');
+                localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                showAchievementNotification(achievements.find(a => a.id === 'gravity_first'));
+            }
+        });
+    }
 
         let timeSpent = parseInt(localStorage.getItem('portfolio_time_spent') || '0');
         let earnedAchievements = JSON.parse(localStorage.getItem('portfolio_achievements') || '[]');
@@ -421,6 +444,9 @@ const Portfolio = (() => {
         let playCount = parseInt(localStorage.getItem('pet_play_count') || '0');
         let sidebarClicks = JSON.parse(localStorage.getItem('sidebar_clicks') || '{}');
         let themeSwitched = localStorage.getItem('theme_switched') === 'true';
+        let skillFilterCount = parseInt(localStorage.getItem('skill_filter_count') || '0');
+        let gravityCount = parseInt(localStorage.getItem('gravity_count') || '0');
+        let petWhispererTimer = null;
 
         const showAchievementNotification = (achievement) => {
             const notification = document.createElement('div');
@@ -751,6 +777,90 @@ const Portfolio = (() => {
             localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
             showAchievementNotification(achievements.find(a => a.id === 'time_traveler'));
         }
+
+        // Skill Enthusiast: Used skill filter buttons at least 5 times
+        document.querySelectorAll('.skill-filters button').forEach(button => {
+            button.addEventListener('click', () => {
+                skillFilterCount++;
+                localStorage.setItem('skill_filter_count', skillFilterCount.toString());
+                if (skillFilterCount >= 5 && !earnedAchievements.includes('skill_enthusiast')) {
+                    earnedAchievements.push('skill_enthusiast');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'skill_enthusiast'));
+                }
+            });
+        });
+
+        // Curiosity Seeker: Clicked on at least one project link
+        document.querySelectorAll('.project-link-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!earnedAchievements.includes('curiosity_seeker')) {
+                    earnedAchievements.push('curiosity_seeker');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'curiosity_seeker'));
+                }
+            });
+        });
+
+        // Gravity Master: Activated gravity effect 3 times
+        const gravityToggle = document.getElementById("gravityToggle");
+        if (gravityToggle) {
+            gravityToggle.addEventListener("click", () => {
+                gravityCount++;
+                localStorage.setItem('gravity_count', gravityCount.toString());
+                if (gravityCount >= 3 && !earnedAchievements.includes('gravity_master')) {
+                    earnedAchievements.push('gravity_master');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'gravity_master'));
+                }
+            });
+        }
+
+        // Pet Whisperer: Maintain pet stats above 80% for 5 consecutive minutes
+        function checkPetWhisperer() {
+            const petState = JSON.parse(localStorage.getItem('digital_pet_state') || '{}');
+            if (petState && petState.hunger >= 80 && petState.happiness >= 80) {
+                if (!petWhispererTimer) {
+                    petWhispererTimer = setTimeout(() => {
+                        if (!earnedAchievements.includes('pet_whisperer')) {
+                            earnedAchievements.push('pet_whisperer');
+                            localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                            showAchievementNotification(achievements.find(a => a.id === 'pet_whisperer'));
+                        }
+                    }, 300000); // 5 minutes
+                }
+            } else {
+                if (petWhispererTimer) {
+                    clearTimeout(petWhispererTimer);
+                    petWhispererTimer = null;
+                }
+            }
+        }
+        setInterval(checkPetWhisperer, 5000);
+
+        // Code Inspector: Opened browser devtools
+        window.addEventListener('keydown', (e) => {
+            if (
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || // Ctrl+Shift+I/J/C
+                (e.key === 'F12')
+            ) {
+                if (!earnedAchievements.includes('code_inspector')) {
+                    earnedAchievements.push('code_inspector');
+                    localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                    showAchievementNotification(achievements.find(a => a.id === 'code_inspector'));
+                }
+            }
+        });
+
+        // Achievement Hunter: Unlocked 10 achievements
+        function checkAchievementHunter() {
+            if (earnedAchievements.length >= 10 && !earnedAchievements.includes('achievement_hunter')) {
+                earnedAchievements.push('achievement_hunter');
+                localStorage.setItem('portfolio_achievements', JSON.stringify(earnedAchievements));
+                showAchievementNotification(achievements.find(a => a.id === 'achievement_hunter'));
+            }
+        }
+        setInterval(checkAchievementHunter, 2000);
     };
 
     function initAchievementsModal() {
@@ -760,7 +870,7 @@ const Portfolio = (() => {
         { id: 'thirty_seconds', name: 'Deep Dive', description: 'Spent 30 seconds on the site.', timeRequired: 30 },
         { id: 'one_minute', name: 'Explorer', description: 'Spent 1 minute on the site.', timeRequired: 60 },
         { id: 'five_minutes', name: 'Dedicated Visitor', description: 'Spent 5 minutes on the site.', timeRequired: 300 },
-        { id: 'gravity_first', name: 'Gravity Explorer', description: 'Activated gravity for the first time!', event: 'gravity' },
+        { id: 'gravity_first', name: 'Sir Isaac Newton jr.', description: 'Activated gravity for the first time!', event: 'gravity' },
         { id: 'pet_first', name: 'Pet Owner', description: 'Interacted with your digital pet for the first time!', event: 'pet' },
         { id: 'pet_feed', name: 'Pet Feeder', description: 'Fed your digital pet for the first time!', event: 'pet_feed' },
         { id: 'theme_switch', name: 'Theme Shifter', description: 'Switched the website theme for the first time!', event: 'theme_switch' },
@@ -769,7 +879,7 @@ const Portfolio = (() => {
         { id: 'pet_play_20', name: 'Play Champion', description: 'Played with your digital pet 20 times!', event: 'pet_play_20' },
         { id: 'pet_happy_zero', name: 'Pet Neglect', description: 'Let your pet\'s happiness drop to 0%.', event: 'pet_happy_zero' },
         { id: 'pet_hunger_zero', name: 'Pet Starved', description: 'Let your pet\'s hunger drop to 0%.', event: 'pet_hunger_zero' },
-        { id: 'birthday_visitor', name: 'Birthday Visitor', description: 'Visited during your birthday month!', event: 'birthday' },
+        { id: 'birthday_visitor', name: 'Birthday Visitor', description: 'Visited during his birthday month!', event: 'birthday' },
         { id: 'holiday_special', name: 'Holiday Special', description: 'Visited during a major holiday!', event: 'holiday' },
         { id: 'new_year_code', name: 'New Year New Code', description: 'Visited in January!', event: 'january' },
         { id: 'leap_day', name: 'Leap Day Bonus', description: 'Visited on February 29th!', event: 'leapday' },
@@ -782,7 +892,7 @@ const Portfolio = (() => {
         { id: 'weekend_warrior', name: 'Weekend Warrior', description: 'Visited on a weekend.', event: 'weekend' },
         { id: 'social_butterfly', name: 'Social Butterfly', description: 'Clicked all social media links.', event: 'social' },
         { id: 'scroll_master', name: 'Scroll Master', description: 'Scrolled to the very bottom of the page.', event: 'scroll' },
-        { id: 'bookmark_buddy', name: 'Bookmark Buddy', description: 'Bookmarked the portfolio site.', event: 'bookmark' },
+        { id: 'bookmark_buddy', name: 'Librarian', description: 'Bookmarked the portfolio site.', event: 'bookmark' },
         { id: 'flash_visit', name: 'Flash Visit', description: 'Visited the site for less than 10 seconds.', event: 'flash' },
         { id: 'time_traveler', name: 'Time Traveler', description: 'Spent a total of 5 hours on the site.', event: '5hours' }
     ];
